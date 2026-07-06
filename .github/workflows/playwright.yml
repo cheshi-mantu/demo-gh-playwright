@@ -74,7 +74,7 @@ jobs:
       with:
         allure-endpoint: https://demo.testops.cloud
         allure-token: ${{ secrets.ALLURE_TOKEN }}
-        allure-project-id: ${{ secrets.ALLURE_PROJECT_ID }}
+        allure-project-id: 4677
         allurectl-version: 2.21.1
     
     - name: Run Playwright tests and upload to Allure TestOps
