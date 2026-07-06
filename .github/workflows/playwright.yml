@@ -1,0 +1,100 @@
+name: playwright tests example
+
+on:
+  # schedule:
+  #   - cron: '0 */8 * * *'  # This will run the workflow daily at 4 AM UTC
+  workflow_dispatch:
+    inputs:
+      TESTS_TYPE:
+        description: "Select type of tests"
+        required: true
+        type: choice
+        options:
+          - test/poco/
+          - test/attachments/
+          - test/unit-many/
+          - test/unit/
+          - test/
+        default: test/poco/
+      TESTS_SUCCESS:
+        description: "Decide if tests would fail or not"
+        required: true
+        type: choice
+        options:
+          - random
+          - always
+          - broken
+          - never
+        default: always
+      TESTS_BROWSER:
+        description: "Tests browser. Leave blank if not required"
+        required: false
+        default: "vivaldi"
+      TESTS_SYTEM_UNDER_TEST:
+        description: "Tests system under test. Leave blank if not required"
+        required: false
+        default: "https://demo.testops.cloud"
+      WRIKE_TASK_ID:
+        description: "Wrike Task ID. Linking launch to Wrike task. Leave blank if not required"
+        required: false
+      ALLURE_JOB_RUN_ID:
+        description: "ALLURE_JOB_RUN_ID service parameter. Leave blank."
+        required: false
+      ALLURE_USERNAME:
+        description: "ALLURE_USERNAME service parameter. Leave blank"
+        required: false
+  # push:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - 'README.md'
+  #     - '*.md'
+  #     - '.gitignore'
+  #     - 'docs/**'
+  #     - '*.txt'
+  #     - 'LICENSE'
+  #     - '.github/workflows/**'
+
+jobs:
+  test:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '21'
+        cache: 'npm'  # This caches node_modules automatically
+    
+    - name: Install dependencies
+      run: npm ci  # Use npm ci for faster, reliable installs in CI
+
+    - name: install and configure allurectl
+      uses: allure-framework/setup-allurectl@v1.0.3
+      with:
+        allure-endpoint: https://demo.testops.cloud
+        allure-token: ${{ secrets.ALLURE_TOKEN }}
+        allure-project-id: ${{ secrets.ALLURE_PROJECT_ID }}
+        allurectl-version: 2.21.1
+    
+    - name: Run Playwright tests and upload to Allure TestOps
+      run: |
+        allurectl watch -- npx playwright ${TESTS_TYPE} || true
+        env | grep "TESTS_"
+        # if [ -n "${WRIKE_TASK_ID}" ]; then
+        #   allurectl launch add-issue --current-launch --integration-id 813 --issue-keys ${WRIKE_TASK_ID}
+        # fi
+      env:
+        ALLURE_JOB_RUN_ID: ${{ github.event.inputs.ALLURE_JOB_RUN_ID }}
+        TESTS_SUCCESS: "${{ inputs.TESTS_SUCCESS }}"
+        TESTS_TYPE: "${{ inputs.TESTS_TYPE }}"
+        ALLURE_RESULTS: "allure-results"
+        ALLURE_LAUNCH_TAGS: "${{ inputs.TESTS_TYPE }}"
+        ALLURE_LAUNCH_NAME: "${{ inputs.TESTS_TYPE }} GH PlayWright"
+
+    # - uses: actions/upload-artifact@v4
+    #   if: always()
+    #   with:
+    #     name: playwright-report
+    #     path: playwright-report/
+    #     retention-days: 2

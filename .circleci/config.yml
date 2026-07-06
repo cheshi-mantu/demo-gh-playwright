@@ -1,0 +1,80 @@
+version: 2.1
+
+parameters:
+  TESTS_TYPE:
+    type: string
+    default: "test/poco/"
+    # options: test/poco/ | test/unit/ | test/unit-many/ | test/attachments/ | test/
+    # NOTE: trailing slash is required for test/unit/ to avoid matching test/unit-many/
+  TESTS_SUCCESS:
+    type: string
+    default: "always"
+    # options: always | random | never | broken
+  TESTS_BROWSER:
+    type: string
+    default: "vivaldi"
+  TESTS_SYSTEM_UNDER_TEST:
+    type: string
+    default: "https://demo.testops.cloud"
+  WRIKE_TASK_ID:
+    type: string
+    default: ""
+  ALLURE_JOB_RUN_ID:
+    type: string
+    default: ""
+  ALLURE_USERNAME:
+    type: string
+    default: ""
+
+jobs:
+  run-tests:
+    docker:
+      - image: cimg/node:21.0
+    resource_class: medium
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: npm ci
+
+      - run:
+          name: Install allurectl
+          command: |
+            wget https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64 \
+              -O ./allurectl
+            chmod +x ./allurectl
+
+      - run:
+          name: Run Playwright tests and upload to Allure TestOps
+          command: ./allurectl watch -- npx playwright test << pipeline.parameters.TESTS_TYPE >> || true
+          environment:
+            ALLURE_ENDPOINT: https://demo.testops.cloud
+            TESTS_TYPE: << pipeline.parameters.TESTS_TYPE >>
+            ALLURE_PROJECT_ID: 4766
+            ALLURE_RESULTS: allure-results
+            ALLURE_LAUNCH_NAME: "<< pipeline.parameters.TESTS_TYPE >> CircleCI Playwright"
+            ALLURE_LAUNCH_TAGS: "<< pipeline.parameters.TESTS_TYPE >>"
+            ALLURE_JOB_RUN_ID: << pipeline.parameters.ALLURE_JOB_RUN_ID >>
+            ALLURE_USERNAME: << pipeline.parameters.ALLURE_USERNAME >>
+            TESTS_SUCCESS: << pipeline.parameters.TESTS_SUCCESS >>
+            TESTS_BROWSER: << pipeline.parameters.TESTS_BROWSER >>
+            TESTS_SYSTEM_UNDER_TEST: << pipeline.parameters.TESTS_SYSTEM_UNDER_TEST >>
+
+workflows:
+  # scheduled:
+  #   triggers:
+  #     - schedule:
+  #         cron: "0 */8 * * *"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - main
+  run:
+    jobs:
+      - run-tests
+
+  manual:
+    jobs:
+      - run-tests
