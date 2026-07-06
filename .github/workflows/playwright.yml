@@ -30,7 +30,7 @@ on:
         description: "Tests browser. Leave blank if not required"
         required: false
         default: "vivaldi"
-      TESTS_SYTEM_UNDER_TEST:
+      TESTS_SYSTEM_UNDER_TEST:
         description: "Tests system under test. Leave blank if not required"
         required: false
         default: "https://demo.testops.cloud"
