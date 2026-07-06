@@ -79,7 +79,7 @@ jobs:
     
     - name: Run Playwright tests and upload to Allure TestOps
       run: |
-        allurectl watch -- npx playwright ${TESTS_TYPE} || true
+        allurectl watch -- npx playwright test ${TESTS_TYPE} || true
         env | grep "TESTS_"
         # if [ -n "${WRIKE_TASK_ID}" ]; then
         #   allurectl launch add-issue --current-launch --integration-id 813 --issue-keys ${WRIKE_TASK_ID}
