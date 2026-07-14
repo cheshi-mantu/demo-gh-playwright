@@ -1,0 +1,83 @@
+trigger: none
+pr: none
+
+parameters:
+  - name: TESTS_TYPE
+    displayName: "Select type of tests"
+    type: string
+    default: "test/poco/"
+    values:
+      - test/poco/
+      - test/attachments/
+      - test/unit-many/
+      - test/unit/
+      - test/
+  - name: TESTS_SUCCESS
+    displayName: "Decide if tests would fail or not"
+    type: string
+    default: "always"
+    values:
+      - random
+      - always
+      - broken
+      - never
+  - name: TESTS_BROWSER
+    displayName: "Tests browser. Leave blank if not required"
+    type: string
+    default: "vivaldi"
+  - name: TESTS_SYSTEM_UNDER_TEST
+    displayName: "Tests system under test. Leave blank if not required"
+    type: string
+    default: "https://demo.testops.cloud"
+  - name: WRIKE_TASK_ID
+    displayName: "Wrike Task ID. Linking launch to Wrike task. Leave blank if not required"
+    type: string
+    default: ""
+  - name: ALLURE_JOB_RUN_ID
+    displayName: "ALLURE_JOB_RUN_ID service parameter. Leave blank."
+    type: string
+    default: ""
+  - name: ALLURE_USERNAME
+    displayName: "ALLURE_USERNAME service parameter. Leave blank."
+    type: string
+    default: ""
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  ALLURE_ENDPOINT: "https://demo.testops.cloud"
+  ALLURE_PROJECT_ID: "4766"
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "21.x"
+    displayName: "Install Node.js"
+
+  - script: npm ci
+    displayName: "Install dependencies"
+
+  - script: |
+      wget https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64 \
+        -O ./allurectl
+      chmod +x ./allurectl
+    displayName: "Install allurectl"
+
+  - script: |
+      ./allurectl watch -- npx playwright test ${TESTS_TYPE} || true
+    displayName: "Run Playwright tests and upload to Allure TestOps"
+    env:
+      ALLURE_ENDPOINT: $(ALLURE_ENDPOINT)
+      ALLURE_TOKEN: $(ALLURE_TOKEN)
+      ALLURE_PROJECT_ID: $(ALLURE_PROJECT_ID)
+      ALLURE_RESULTS: "allure-results"
+      TESTS_TYPE: "${{ parameters.TESTS_TYPE }}"
+      TESTS_SUCCESS: "${{ parameters.TESTS_SUCCESS }}"
+      TESTS_BROWSER: "${{ parameters.TESTS_BROWSER }}"
+      TESTS_SYSTEM_UNDER_TEST: "${{ parameters.TESTS_SYSTEM_UNDER_TEST }}"
+      WRIKE_TASK_ID: "${{ parameters.WRIKE_TASK_ID }}"
+      ALLURE_JOB_RUN_ID: "${{ parameters.ALLURE_JOB_RUN_ID }}"
+      ALLURE_USERNAME: "${{ parameters.ALLURE_USERNAME }}"
+      ALLURE_LAUNCH_NAME: "${{ parameters.TESTS_TYPE }} Azure DevOps Playwright"
+      ALLURE_LAUNCH_TAGS: "${{ parameters.TESTS_TYPE }}"
