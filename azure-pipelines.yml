@@ -29,10 +29,6 @@ parameters:
     displayName: "Tests system under test. Leave blank if not required"
     type: string
     default: "https://demo.testops.cloud"
-  - name: WRIKE_TASK_ID
-    displayName: "Wrike Task ID. Linking launch to Wrike task. Leave blank if not required"
-    type: string
-    default: ""
   - name: ALLURE_JOB_RUN_ID
     displayName: "ALLURE_JOB_RUN_ID service parameter. Leave blank."
     type: string
