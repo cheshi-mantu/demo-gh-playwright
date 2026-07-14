@@ -40,10 +40,10 @@ variables:
     value: "4766"
   # Overridable via API (e.g. by Allure TestOps) as pipeline run variables.
   # UI runs leave these blank, so they fall back to the corresponding parameter.
-  - name: TESTS_TYPE
-    value: ""
-  - name: TESTS_SUCCESS
-    value: ""
+  # - name: TESTS_TYPE
+  #   value: ""
+  # - name: TESTS_SUCCESS
+  #   value: ""
   - name: TESTS_TYPE_RESOLVED
     value: $[ coalesce(variables['TESTS_TYPE'], '${{ parameters.TESTS_TYPE }}') ]
   - name: TESTS_SUCCESS_RESOLVED
