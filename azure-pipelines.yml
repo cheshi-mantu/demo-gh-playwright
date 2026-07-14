@@ -66,7 +66,7 @@ steps:
     env:
       ALLURE_ENDPOINT: $(ALLURE_ENDPOINT)
       ALLURE_TOKEN: $(ALLURE_TOKEN)
-      ALLURE_PROJECT_ID: $(ALLURE_PROJECT_ID)
+      ALLURE_PROJECT_ID: 4766
       ALLURE_RESULTS: "allure-results"
       TESTS_TYPE: "${{ parameters.TESTS_TYPE }}"
       TESTS_SUCCESS: "${{ parameters.TESTS_SUCCESS }}"
