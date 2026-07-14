@@ -26,17 +26,9 @@ parameters:
     type: string
     default: "vivaldi"
   - name: TESTS_SYSTEM_UNDER_TEST
-    displayName: "Tests system under test. Leave blank if not required"
+    displayName: "Test bed to run tests on."
     type: string
     default: "https://demo.testops.cloud"
-  - name: ALLURE_JOB_RUN_ID
-    displayName: "ALLURE_JOB_RUN_ID service parameter. Leave blank."
-    type: string
-    default: ""
-  - name: ALLURE_USERNAME
-    displayName: "ALLURE_USERNAME service parameter. Leave blank."
-    type: string
-    default: ""
 
 pool:
   vmImage: "ubuntu-latest"
