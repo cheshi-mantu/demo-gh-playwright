@@ -64,8 +64,5 @@ steps:
       TESTS_SUCCESS: "${{ parameters.TESTS_SUCCESS }}"
       TESTS_BROWSER: "${{ parameters.TESTS_BROWSER }}"
       TESTS_SYSTEM_UNDER_TEST: "${{ parameters.TESTS_SYSTEM_UNDER_TEST }}"
-      WRIKE_TASK_ID: "${{ parameters.WRIKE_TASK_ID }}"
-      ALLURE_JOB_RUN_ID: "${{ parameters.ALLURE_JOB_RUN_ID }}"
-      ALLURE_USERNAME: "${{ parameters.ALLURE_USERNAME }}"
       ALLURE_LAUNCH_NAME: "${{ parameters.TESTS_TYPE }} Azure DevOps Playwright"
       ALLURE_LAUNCH_TAGS: "${{ parameters.TESTS_TYPE }}"
