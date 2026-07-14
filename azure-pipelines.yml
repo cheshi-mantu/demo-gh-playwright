@@ -34,8 +34,20 @@ pool:
   vmImage: "ubuntu-latest"
 
 variables:
-  ALLURE_ENDPOINT: "https://demo.testops.cloud"
-  ALLURE_PROJECT_ID: "4766"
+  - name: ALLURE_ENDPOINT
+    value: "https://demo.testops.cloud"
+  - name: ALLURE_PROJECT_ID
+    value: "4766"
+  # Overridable via API (e.g. by Allure TestOps) as pipeline run variables.
+  # UI runs leave these blank, so they fall back to the corresponding parameter.
+  - name: TESTS_TYPE
+    value: ""
+  - name: TESTS_SUCCESS
+    value: ""
+  - name: TESTS_TYPE_RESOLVED
+    value: $[ coalesce(variables['TESTS_TYPE'], '${{ parameters.TESTS_TYPE }}') ]
+  - name: TESTS_SUCCESS_RESOLVED
+    value: $[ coalesce(variables['TESTS_SUCCESS'], '${{ parameters.TESTS_SUCCESS }}') ]
 
 steps:
   - task: NodeTool@0
@@ -60,9 +72,9 @@ steps:
       ALLURE_TOKEN: $(ALLURE_TOKEN)
       ALLURE_PROJECT_ID: 4766
       ALLURE_RESULTS: "allure-results"
-      TESTS_TYPE: "${{ parameters.TESTS_TYPE }}"
-      TESTS_SUCCESS: "${{ parameters.TESTS_SUCCESS }}"
+      TESTS_TYPE: "$(TESTS_TYPE_RESOLVED)"
+      TESTS_SUCCESS: "$(TESTS_SUCCESS_RESOLVED)"
       TESTS_BROWSER: "${{ parameters.TESTS_BROWSER }}"
       TESTS_SYSTEM_UNDER_TEST: "${{ parameters.TESTS_SYSTEM_UNDER_TEST }}"
-      ALLURE_LAUNCH_NAME: "${{ parameters.TESTS_TYPE }} Azure DevOps Playwright"
-      ALLURE_LAUNCH_TAGS: "${{ parameters.TESTS_TYPE }}"
+      ALLURE_LAUNCH_NAME: "$(TESTS_TYPE_RESOLVED) Azure DevOps Playwright"
+      ALLURE_LAUNCH_TAGS: "$(TESTS_TYPE_RESOLVED)"
